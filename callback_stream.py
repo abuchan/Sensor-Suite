@@ -4,8 +4,6 @@ import time
 import threading
 from asynch_dispatch import *
 
-import shared
-
 class CallbackStream(threading.Thread):
 	def __init__(self, sinks = None, callbacks = None):
 		threading.Thread.__init__(self)
@@ -51,6 +49,7 @@ class CallbackStream(threading.Thread):
 	#XBee callback function, called every time a packet is recieved
 	def xbee_received(self, packet):
 			rf_data = packet
+			print rf_data
 			#rssi = ord(packet.get('rssi'))
 			#(src_addr, ) = unpack('H', packet.get('source_addr'))
 			#id = packet.get('id')

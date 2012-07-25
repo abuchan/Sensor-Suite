@@ -9,30 +9,67 @@ class SourcesStream(threading.Thread):
 
 		self.dispatcher = AsynchDispatch(sinks = sinks, callbacks = callbacks)
 		self.sources_list = []
-
-		if autoStart:
-			self.start()
+		self.new_source = []
+		self.source_queue = Queue.Queue()
+		
+		self.start()
 
 	def run(self):
 		while(True):
-			pass
+			if not self.source_queue.empty():
+				entry = self.source_queue.get()
+			
+				if entry[0] == 'Light':
+					self.light_source(entry[0], entry[1], entry[2], entry[3], entry[4])
+				elif entry[0] == 'Chemical':
+					self.chemical_source(entry[0], entry[1], entry[2], entry[3], entry[4])
+				elif entry[0] == 'Radioactive':
+					self.radioactive_source(entry[0], entry[1], entry[2], entry[3], entry[4])
+				elif entry[0] == 'Humidity':
+					self.humidity_source(entry[0], entry[1], entry[2], entry[3], entry[4])
+				elif entry[0] == 'Sound':
+					self.sound_source(entry[0], entry[1], entry[2], entry[3], entry[4])
+				else:
+					pass
 
 	def add_sinks(self, sinks):
 		self.dispatcher.add_sinks(sinks)
 
-	def put(self, message):
-		print message
+	def put(self, data):
+		self.source_queue.put(data)
 
 	def update(self, type, x_pos, y_pos, z_pos, time):
-		self.new_source = [type, x_pos, y_pos, z_pos, time]
-		self.sources_list.append(self.new_source)
-		self.define_source(self.new_source)
-
-	def show(self):
-		self.list= 0
-		for self.list in self.sources_list:
-			print self.list
+		if type == 'Light':
+			self.light_source(type, x_pos, y_pos, z_pos, time)
+		elif type == 'Chemical':
+			self.chemical_source(type, x_pos, y_pos, z_pos, time)
+		elif type == 'Radioactive':
+			self.radioactive_source(type, x_pos, y_pos, z_pos, time)
+		elif type == 'Humidity':
+			self.humidity_source(type, x_pos, y_pos, z_pos, time)
+		elif type == 'Sound':
+			self.sound_source(type, x_pos, y_pos, z_pos, time)
 	
-	#defines a source, can perform options to customize source
-	def define_source(self, source):
-		self.dispatcher.dispatch(Message('source', source))
+	def show(self):
+		print self.new_source
+		
+	def light_source(self, type, x, y, z, time):
+		#X: -204, Y: 43.4, Z: -392
+		self.new_source = [type, x, y, z, time]
+		self.dispatcher.dispatch(Message('source', self.new_source))
+		
+	def chemical_source(self, type, x, y, z, time):
+		self.new_source = [type, x, y, z, time]
+		self.dispatcher.dispatch(Message('source', self.new_source))
+		
+	def radioactive_source(self, type, x, y, z, time):
+		self.new_source = [type, x, y, z, time]
+		self.dispatcher.dispatch(Message('source', self.new_source))
+		
+	def humidity_source(self, type, x, y, z, time):
+		self.new_source = [type, x, y, z, time]
+		self.dispatcher.dispatch(Message('source', self.new_source))
+		
+	def sound_source(self, type, x, y, z, time):
+		self.new_source = [type, x, y, z, time]
+		self.dispatcher.dispatch(Message('source', self.new_source))

@@ -16,12 +16,10 @@ class OptitrakStream(threading.Thread):
 
 		self.c.Initialize("127.0.0.1", "127.0.0.1")
 		
-		self.new_data = threading.Condition()
-    
 		self.dispatcher=AsynchDispatch(sinks=sinks)
-		
 		self.recieve_queue = Queue.Queue()
-		
+		self.input_data = []
+
 		self.c.SetDataCallback(self.get_Net_Callback)
 		
 		if autoStart:
@@ -29,7 +27,6 @@ class OptitrakStream(threading.Thread):
 		
 	def run(self):
 		while (True):
-			self.time.sleep(20)
 			pass
 
 	def get(self):
@@ -44,10 +41,11 @@ class OptitrakStream(threading.Thread):
 	def add_sinks(self,sinks):
 		self.dispatcher.add_sinks(sinks)
 	
-	def update(self, array):
-		input_data = "x %.2f  y %.2f  z %.2f  qx %.4f  qy %.4f  qz %.4f qw %.4f" % (
-								 array.data.x, array.data.y, array.data.z, array.data.qx, array.data.qy, array.data.qz, array.data.qw)
-
 	def get_Net_Callback(self, dataFrame):
 		body = dataFrame.RigidBodies[0]
-		self.dispatcher.dispatch(Message('optitrak_data', body))
+#		"x %.2f  y %.2f  z %.2f  qx %.4f  qy %.4f  qz %.4f qw %.4f" % 
+		self.input_data = [body.x, body.y, body.z, body.qx, body.qy, body.qz, body.qw]
+	
+	def get_optitrak_position(self):
+		self.dispatcher.dispatch(Message('optitrak_data', self.input_data))
+		

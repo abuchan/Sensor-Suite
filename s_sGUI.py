@@ -5,11 +5,7 @@ from wxPython.lib.dialogs import *
 import threading
 
 import sys, time, traceback
-from basestation_stream import BasestationStream
 from asynch_dispatch import *
-from optitrak_stream import OptitrakStream
-from or_helpers_stream import HelpersStream
-import GUI_helpers as gh
 
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
@@ -18,7 +14,7 @@ import numpy as np
 from matplotlib.figure import Figure
 
 class GUIStream(threading.Thread):
-	def __init__(self, frameClass=None, title='SkyNet', callbacks=None, sinks=None, autoStart=True):
+	def __init__(self, frameClass=None, title='Sources and Sensors', callbacks=None, sinks=None, autoStart=True):
 		threading.Thread.__init__(self)
 		self.daemon = True
     
@@ -141,7 +137,8 @@ class PageOne(wx.Panel):
 		bbs1.Add(self.z_pos, (1,4))
 		self.time_label = wx.StaticText(self, -1, label = 'TIME VARIANCE')
 		bbs1.Add(self.time_label, (0,5))
-		self.source_time = wx.TextCtrl(self, -1, name = 'time')
+		self.source_time = wx.Choice(self, choices = ['linear', 'log', 'sine', 'cosine'])
+		self.source_time.Select(0)
 		bbs1.Add(self.source_time, (1,5))
 
 		#Add sources Button
@@ -209,7 +206,7 @@ class PageOne(wx.Panel):
 		self.x = self.x_pos.GetValue()
 		self.y = self.y_pos.GetValue()
 		self.z = self.z_pos.GetValue()
-		self.time = self.source_time.GetValue()
+		self.time = self.source_time.GetStringSelection()
 
 		dispatcher.dispatch(Message('source_coord',[self.type, self.x, self.y, self.z, self.time]))
 

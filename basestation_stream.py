@@ -5,13 +5,12 @@ import Queue
 import time
 import serial
 import sys
-from packet import Packet
 from struct import pack, unpack
 from asynch_dispatch import *
 from callback_stream import CallbackStream
 
 class BasestationStream(threading.Thread):
-	def __init__(self, sinks = None, callbacks = None, port='COM5', baudrate=57600, addr='\x30\x02', timeout=-1, 
+	def __init__(self, sinks = None, callbacks = None, port='COM3', baudrate=57600, addr='\x30\x02', timeout=-1, 
 							timeoutFunction = None):
 		threading.Thread.__init__(self)
 		self.daemon = True
