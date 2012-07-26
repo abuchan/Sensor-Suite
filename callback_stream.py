@@ -103,7 +103,6 @@ class CallbackStream(threading.Thread):
 						self.dispatcher.dispatch(Message('steering_gains_set', gains))
 					# SET_CTRLD_TURN_RATE
 					elif type == command.SET_CTRLD_TURN_RATE:
-						print "Set turning rate"
 						rate = unpack(pattern, data)[0]
 						self.dispatcher.dispatch(Message('turn_rate', rate))
 						self.dispatcher.dispatch(Message('steering_rate_set', rate))
