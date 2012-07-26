@@ -113,7 +113,6 @@ class PageOne(wx.Panel):
 		#Redirecting sys.out to text field
 		redir=RedirectText(self.outputData)
 		sys.stdout=redir
-		sys.sterr=redir
 
 		#input boxes
 		self.source_type_label = wx.StaticText(self, -1, label = 'SOURCE TYPE')
@@ -151,6 +150,10 @@ class PageOne(wx.Panel):
 		self.Bind(wx.EVT_BUTTON, self.show_sources_click, self.show_sources)
 		bbs2.Add(self.show_sources,2,wx.ALL,1)
 
+		self.seek_source = wx.Button(self, -1, label = 'Seek Source')
+		self.Bind(wx.EVT_BUTTON, self.seek_sources_click, self.seek_source)
+		bbs2.Add(self.seek_source,3,wx.ALL,1)
+		
 		tbs1.Add(tbsGridSize,3,wx.EXPAND,5)
 
 		#adding all the sizers to the panel; layout of the panel
@@ -172,8 +175,8 @@ class PageOne(wx.Panel):
 		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
 
 	def straightButtonClick(self,e):
-		self.right_throt = 20
-		self.left_throt = 20
+		self.right_throt = 50
+		self.left_throt = 50
 		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
 
 	def slowButtonClick(self,e):
@@ -199,6 +202,7 @@ class PageOne(wx.Panel):
 		select=event.GetSelection()
 		if select == 0:
 			self.addr = '\x30\x02'
+			dispatcher.dispatch(Message('set_addr', self.addr))
 			print "You chose number: " + str(repr(self.addr)) + " robot"
 
 	def add_source_click(self, e):
@@ -211,7 +215,10 @@ class PageOne(wx.Panel):
 		dispatcher.dispatch(Message('source_coord',[self.type, self.x, self.y, self.z, self.time]))
 
 	def show_sources_click(self, e):
-		dispatcher.dispatch(Message('show_sources', 'show'))
+		dispatcher.dispatch(Message('show_source', 'show'))
+	
+	def seek_sources_click(self, e):
+		dispatcher.dispatch(Message('seek_source', [50, 50]))
 
 	def on_text(self, text):
 		self.outputData.AppendText(text)
@@ -282,10 +289,10 @@ class ThreadedFrame(wx.Frame):
 
 		dispatcher.dispatch(Message('reset', self.addr))
 		time.sleep(0.15)
-		#motorgains = [200,2,0,2,0,    200,2,0,2,0]
-		motorgains = [5000,100,0,0,0,5000,100,0,0,0] #Hardware PID
 
-		dispatcher.dispatch(Message('motor', [self.addr, motorgains]))
+		dispatcher.dispatch(Message('motor',[5000,100,0,0,0,5000,100,0,0,0]))
+		
+		dispatcher.dispatch(Message('steer_gains', [50,10,0,0,0,0]))
 
 	def OnAbout(self,e):
 		# Standard dialogue box with an "ok" button
@@ -298,6 +305,5 @@ class ThreadedFrame(wx.Frame):
 		sys.exit()
 
 	def OnCloseWindow(self,e):
-		dispatcher.dispatch(Message('quit', 'quit'))
-		self.Destroy()
+		dispatcher.dispatch(Message('quit','quit'))
 		sys.exit()
