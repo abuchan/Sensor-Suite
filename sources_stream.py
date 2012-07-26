@@ -38,18 +38,6 @@ class SourcesStream(threading.Thread):
 	def put(self, data):
 		self.source_queue.put(data)
 
-	def update(self, type, x_pos, y_pos, z_pos, time):
-		if type == 'Light':
-			self.light_source(type, x_pos, y_pos, z_pos, time)
-		elif type == 'Chemical':
-			self.chemical_source(type, x_pos, y_pos, z_pos, time)
-		elif type == 'Radioactive':
-			self.radioactive_source(type, x_pos, y_pos, z_pos, time)
-		elif type == 'Humidity':
-			self.humidity_source(type, x_pos, y_pos, z_pos, time)
-		elif type == 'Sound':
-			self.sound_source(type, x_pos, y_pos, z_pos, time)
-	
 	def show(self):
 		print self.new_source
 		
