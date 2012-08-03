@@ -16,7 +16,7 @@ class BasestationStream(threading.Thread):
 		self.daemon = True
 
 		try:
-			self.ser = serial.Serial(port, baudrate, timeout=3, rtscts=0)
+			self.ser = serial.Serial(port, baudrate, timeout=3, rtscts=1)
 			print "Serial Port Set Up"
 		except serial.serialutil.SerialException:
 			print "Could not open serial port:%d"
