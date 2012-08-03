@@ -172,30 +172,30 @@ class PageOne(wx.Panel):
 	def forwardButtonClick(self,e):
 		self.right_throt = self.right_throt + 20
 		self.left_throt = self.left_throt + 20
-		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
+		dispatcher.dispatch(Message('throt_speed', [self.left_throt, self.right_throt]))
 
 	def straightButtonClick(self,e):
 		self.right_throt = 50
 		self.left_throt = 50
-		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
+		dispatcher.dispatch(Message('throt_speed', [self.left_throt, self.right_throt]))
 
 	def slowButtonClick(self,e):
 		self.right_throt = self.right_throt - 20
 		self.left_throt = self.left_throt - 20
-		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
+		dispatcher.dispatch(Message('throt_speed', [self.left_throt, self.right_throt]))
 
 	def emergencyStopButtonClick(self,event):
 		self.right_throt = 0
 		self.left_throt = 0
-		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
+		dispatcher.dispatch(Message('e_stop', [self.left_throt, self.right_throt]))
 
 	def rightButtonClick(self,e):
 		self.left_throt = self.right_throt + 20
-		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
+		dispatcher.dispatch(Message('throt_speed', [self.left_throt, self.right_throt]))
 
 	def leftButtonClick(self,e):
 		self.right_throt = self.left_throt + 20
-		dispatcher.dispatch(Message('throt_speed', [self.addr, self.left_throt, self.right_throt]))
+		dispatcher.dispatch(Message('throt_speed', [self.left_throt, self.right_throt]))
 
 	#Determines which destination address to send commands to
 	def OnSelect(self, event):
@@ -290,9 +290,9 @@ class ThreadedFrame(wx.Frame):
 		dispatcher.dispatch(Message('reset', self.addr))
 		time.sleep(0.15)
 
-		dispatcher.dispatch(Message('motor',[5000,100,0,0,0,5000,100,0,0,0]))
+		dispatcher.dispatch(Message('motor',[30000,0,0,0,40 , 30000,0,0,0,40]))
 		
-		dispatcher.dispatch(Message('steer_gains', [50,10,0,0,0,0]))
+		dispatcher.dispatch(Message('steer_gains', [0,0,0,0,0,0]))
 
 	def OnAbout(self,e):
 		# Standard dialogue box with an "ok" button
