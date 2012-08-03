@@ -131,7 +131,7 @@ class HelpersStream(threading.Thread):
 		self.deg2count = 14.375
 		self.count2deg = 1/self.deg2count
 		self.angRate = round( self.angRateDeg / self.count2deg)
-		self.xb_send(self.addr, 0, command.SET_CTRLD_TURN_RATE, pack('h',self.angRate))
+		self.xb_send(self.addr, 0, command.SET_CTRLD_TURN_RATE, pack('=h',self.angRate))
 		time.sleep(0.3)
 		
 	def setMotorGains(self, gains):
