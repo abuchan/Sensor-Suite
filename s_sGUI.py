@@ -187,7 +187,7 @@ class PageOne(wx.Panel):
 	def emergencyStopButtonClick(self,event):
 		self.right_throt = 0
 		self.left_throt = 0
-		dispatcher.dispatch(Message('e_stop', [self.left_throt, self.right_throt]))
+		dispatcher.dispatch(Message('e-stop', [self.left_throt, self.right_throt]))
 
 	def rightButtonClick(self,e):
 		self.left_throt = self.right_throt + 20
