@@ -8,7 +8,7 @@ class SourcesStream(threading.Thread):
 		self.daemon = True
 
 		self.dispatcher = AsynchDispatch(sinks = sinks, callbacks = callbacks)
-		self.sources_list = []
+		self.source_data = []
 		self.new_source = []
 		self.source_queue = Queue.Queue()
 		
@@ -61,3 +61,7 @@ class SourcesStream(threading.Thread):
 	def sound_source(self, type, x, y, z, time):
 		self.new_source = [type, x, y, z, time]
 		self.dispatcher.dispatch(Message('source', self.new_source))
+		
+	def populate_source_data(self):
+		self.source_data = [[[0 for z in range(12)]for y in range(0, 10)]for x in range(5)]
+		
