@@ -138,13 +138,17 @@ class SensorStream(threading.Thread):
 			self.heading = self.angle - self.yaw
 		
 #		print [self.heading, self.angle, self.yaw, self.sx - self.px, self.sz - self.pz]
-		self.dispatcher.dispatch(Message('calc_sens',[self.heading, self.sx-self.px,
-																								 self.sz-self.pz]))
-																								
+		self.dispatcher.dispatch(Message('calc_sens',[self.heading, self.sx-self.px, self.sz-self.pz]))
+
+	#sensor that emulates a light source
 	def TeMuBeTraR(self):
 		HBS = 0
+		null_target = 0
 		self.angle = (math.atan2(self.sx - self.px, self.sz - self.pz))*(180/math.pi)
-		if self.angle - self.yaw < 20 and self.angle - self.yaw >= 0:
+		if self.sx == 0 and self.sz == 0:
+			null_target = null_target + 1
+			break
+		elif self.angle - self.yaw < 20 and self.angle - self.yaw >= 0:
 			self.heading = self.angle - self.yaw
 			self.ATLS = 1
 			HBS = 0
@@ -160,12 +164,11 @@ class SensorStream(threading.Thread):
 				self.heading = 70
 				HBS = HBS + 1
 		
-		if HBS > 70 and HBS < 210:
+		if HBS > 70 and HBS <= 210 or null_target > 0 and null_target <= 40:
 			self.dispatcher.dispatch(Message('calc_sens', [(self.heading * 10), self.sx-self.px, self.sz-self.pz]))
-		elif HBS > 210:
+		elif HBS > 210 or null_target > 40:
 			self.dispatcher.dispatch(Message('calc_sens', [self.heading, 0, 0]))
 		else:
-#		print [self.heading, self.angle, self.yaw, self.sx - self.px, self.sz - self.pz]
 			self.dispatcher.dispatch(Message('calc_sens',[self.heading, self.sx-self.px, self.sz-self.pz]))
 
 	#converts quaternion output of optitrak to euler angles
