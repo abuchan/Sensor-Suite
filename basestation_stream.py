@@ -51,8 +51,6 @@ class BasestationStream(threading.Thread):
 					self.xb.halt()
 					self.ser.close()
 
-				time.sleep(0.25)
-
 	def get(self):
 		if not self.receive_queue.empty():
 			return self.receive_queue.get()
