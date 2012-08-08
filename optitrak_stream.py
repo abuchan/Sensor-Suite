@@ -18,7 +18,7 @@ class OptitrakStream(threading.Thread):
 		
 		self.dispatcher=AsynchDispatch(sinks=sinks)
 		self.recieve_queue = Queue.Queue()
-		self.input_data = []
+		self.input_data = ''
 
 		self.c.SetDataCallback(self.get_Net_Callback)
 		
