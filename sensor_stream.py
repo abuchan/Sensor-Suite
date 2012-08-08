@@ -30,6 +30,7 @@ class SensorStream(threading.Thread):
 		self.pitch = 0.0
 		self.yaw = 0.0
 		self.angle = 0
+		self.ATLS = 0
 		
 
 		self.start()
@@ -102,20 +103,20 @@ class SensorStream(threading.Thread):
 		sen_22 = (self.px + 25) - self.ox2
 		sen_12 = (self.px - 25) - self.ox2
 		sen_21 = (self.px + 25) - self.ox1
-		#print [(self.px + 20), (self.px - 20), self.ox1, self.ox2]
-		if (self.px - 25) > self.ox1 and (self.px + 25) < self.ox2 and sen_11 > 20 and sen_22 < -20:
-			self.heading = 0
-		elif (self.px - 25) > self.ox1 and (self.px + 25) < self.ox2 and sen_11 > -30 and sen_11 < 30:
+#		print [(self.px + 20), (self.px - 20), sen_11, sen_22, sen_12, sen_21]
+#		if (self.px - 25) > self.ox1 and (self.px + 25) < self.ox2 and sen_11 >= 40 and sen_22 <= -40:
+#			self.heading = 0
+		if (self.px - 25) > self.ox1 and (self.px + 25) < self.ox2 and sen_11 > -30 and sen_11 < 40:
 			self.heading = -30
 		elif (self.px - 25) > self.ox1 and (self.px + 25) < self.ox2 and sen_22 < 30 and sen_22 > -40:
 			self.heading = 30
-		elif (self.px - 25) < self.ox1 and sen_21 <= 5 and sen_21 > -25:
+		elif (self.px + 25) < self.ox1 and sen_21 <= 30 and sen_21 > -100:
 			self.heading = 30
-		elif (self.px - 25) > self.ox2 and sen_12 >= 5 and sen_12 < 25:
+		elif (self.px - 25) > self.ox2 and sen_12 >= 30 and sen_12 < 100:
 			self.heading = -30
 		else:
 			self.heading = 0
-			#self.calc_bearing_sensor_value()
+#			self.calc_bearing_sensor_value()
 
 		if self.yaw < -90 or self.yaw > 90:
 			self.dispatcher.dispatch(Message('calc_sens', [self.heading, self.sx-self.px, self.sz-self.pz]))
@@ -139,6 +140,34 @@ class SensorStream(threading.Thread):
 #		print [self.heading, self.angle, self.yaw, self.sx - self.px, self.sz - self.pz]
 		self.dispatcher.dispatch(Message('calc_sens',[self.heading, self.sx-self.px,
 																								 self.sz-self.pz]))
+																								
+	def TeMuBeTraR(self):
+		HBS = 0
+		self.angle = (math.atan2(self.sx - self.px, self.sz - self.pz))*(180/math.pi)
+		if self.angle - self.yaw < 20 and self.angle - self.yaw >= 0:
+			self.heading = self.angle - self.yaw
+			self.ATLS = 1
+			HBS = 0
+		elif self.angle - self.yaw > -20 and self.angle - self.yaw < 0:
+			self.heading = self.angle - self.yaw
+			self.ATLS = -1
+			HBS = 0
+		else:
+			if self.ATLS == -1:
+				self.heading = -70
+				HBS = HBS + 1
+			else:
+				self.heading = 70
+				HBS = HBS + 1
+		
+		if HBS > 70 and HBS < 210:
+			self.dispatcher.dispatch(Message('calc_sens', [(self.heading * 10), self.sx-self.px, self.sz-self.pz]))
+		elif HBS > 210:
+			self.dispatcher.dispatch(Message('calc_sens', [self.heading, 0, 0]))
+		else:
+#		print [self.heading, self.angle, self.yaw, self.sx - self.px, self.sz - self.pz]
+			self.dispatcher.dispatch(Message('calc_sens',[self.heading, self.sx-self.px, self.sz-self.pz]))
+
 	#converts quaternion output of optitrak to euler angles
 	def convert_quat_euler(self):
 		#qw:q0, qx:q1, qy:q2, qz:q3
@@ -147,4 +176,4 @@ class SensorStream(threading.Thread):
 		self.pitch = (math.asin(2.0*(self.qw * self.qz - self.qy * self.qx))) *(180/math.pi)
 		self.yaw = (math.atan2(2.0*(self.qw * self.qy + self.qx * self.qz),
 															(1.0-(2.0*(self.qy**2 + self.qz**2))))) * (180/math.pi)
-		self.calc_double_ir_sensor_value()
+		self.TeMuBeTraR()
