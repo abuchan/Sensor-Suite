@@ -9,17 +9,26 @@ class SearchStream(threading.Thread):
 
 		self.dispatcher = AsynchDispatch(sinks = sinks, callbacks = callbacks)
 		self.sensor_queue = Queue.Queue()
+		self._stop = threading.Event()
+		#self.fileout = open('trial_data.txt', 'a')
 #		self.start()
 
 	def set_seek_source(self):
+		self._stop.clear()
 		self.start()
 		
 	def run(self):
-		while True:
-			time.sleep(.75)
+		while not self.stopped():
+			time.sleep(.1)
 			self.get_sensor_data()
 			pass
-	
+
+	def stop(self):
+		self._stop.set()
+		
+	def stopped(self):
+		return self._stop.isSet()
+
 	def add_sinks(self, sinks):
 		self.dispatcher.add_sinks(sinks)
 
@@ -33,14 +42,18 @@ class SearchStream(threading.Thread):
 		if data[1] < 150 and data[1] > -150 and data[2] < 150 and data[2] > -150:
 			self.dispatcher.dispatch(Message('steer_rate', [0,0]))
 		elif data[0] <= -50:
-			self.dispatcher.dispatch(Message('steer_rate', [70, 30]))
+			self.dispatcher.dispatch(Message('steer_rate', [70, 20]))
 		elif data[0] >= 50:
-			self.dispatcher.dispatch(Message('steer_rate', [30, 70]))
+			self.dispatcher.dispatch(Message('steer_rate', [20, 70]))
 		elif data[0] > -50 and data[0] < -20:
-			self.dispatcher.dispatch(Message('steer_rate', [30, 15]))
+			self.dispatcher.dispatch(Message('steer_rate', [50, 15]))
 		elif data[0] > 20 and data[0] < 50:
-			self.dispatcher.dispatch(Message('steer_rate', [15, 30]))
+			self.dispatcher.dispatch(Message('steer_rate', [15, 60]))
 		elif data[0] == 0:
-			self.dispatcher.dispatch(Message('steer_rate', [30, 30]))
+			self.dispatcher.dispatch(Message('steer_rate', [50, 50]))
+		elif data[0] == 700:
+			self.dispatcher.dispatch(Message('steer_rate', [0, 70]))
+		elif data[0] == -700:
+			self.dispatcher.dispatch(Message('steer_rate', [70, 0]))
 		else:
 			self.dispatcher.dispatch(Message('steer_rate', [70, 70]))
