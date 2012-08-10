@@ -31,7 +31,7 @@ class SensorStream(threading.Thread):
 		self.yaw = 0.0
 		self.angle = 0
 		self.ATLS = 0
-		
+		self.HBS = 0
 
 		self.start()
 
@@ -44,12 +44,12 @@ class SensorStream(threading.Thread):
 
 	def put(self, data):
 		self.position_queue.put(data)
-		
+
 	#used when defining obstacles with IR sensor
 	def set_obstacle(self, ob_x1, ob_x2):
 		self.ox1 = ob_x1
 		self.ox2 = ob_x2
-	
+
 	#sets a user defined source
 	def set_source(self, type, x_pos, y_pos, z_pos, time):
 		self.type = type
@@ -57,13 +57,13 @@ class SensorStream(threading.Thread):
 		self.sy = y_pos
 		self.sz = z_pos
 		self.t = time
-		
+
 	#sets position of source if tracking 2 bodies with optitrak
 	def set_moving_source(self, x, y, z):
 		self.sx = x * 1000.0
 		self.sy = y * 1000.0
 		self.sz = z * 1000.0
-	
+
 	#sets the position of the robot
 	def set_postion(self, x, y, z, qx, qy, qz, qw):
 		self.px = x * 1000.0
@@ -74,7 +74,8 @@ class SensorStream(threading.Thread):
 		self.qz = qz
 		self.qw = qw
 		self.convert_quat_euler()
-	
+
+	#IR sensor used to avoid an obstacle
 	def calc_ir_sensor_value(self):
 		self.x_dis = (self.px + 50) - self.ox1
 		self.z_dis = (self.pz + 50) - self.oz1
@@ -98,6 +99,7 @@ class SensorStream(threading.Thread):
 			#print 'calc_bearing_sensor_value'
 			self.calc_bearing_sensor_value()
 
+	#IR Sensor used to traverse a tunnel
 	def calc_double_ir_sensor_value(self):
 		sen_11 = (self.px - 25) - self.ox1
 		sen_22 = (self.px + 25) - self.ox2
@@ -122,7 +124,7 @@ class SensorStream(threading.Thread):
 			self.dispatcher.dispatch(Message('calc_sens', [self.heading, self.sx-self.px, self.sz-self.pz]))
 		else:
 			self.dispatcher.dispatch(Message('calc_sens', [(self.heading * -1), self.sx-self.px, self.sz-self.pz]))
-			
+
 	#simple bearing to target sensor algorithm
 	def calc_bearing_sensor_value(self):
 		self.angle = (math.atan2(self.sx - self.px, self.sz - self.pz))*(180/math.pi)
@@ -136,38 +138,40 @@ class SensorStream(threading.Thread):
 			self.heading = ((self.angle - self.yaw) % 180) * -1
 		else:
 			self.heading = self.angle - self.yaw
-		
+
 #		print [self.heading, self.angle, self.yaw, self.sx - self.px, self.sz - self.pz]
 		self.dispatcher.dispatch(Message('calc_sens',[self.heading, self.sx-self.px, self.sz-self.pz]))
 
 	#sensor that emulates a light source
 	def TeMuBeTraR(self):
-		HBS = 0
-		null_target = 0
 		self.angle = (math.atan2(self.sx - self.px, self.sz - self.pz))*(180/math.pi)
 		if self.sx == 0 and self.sz == 0:
-			null_target = null_target + 1
-			break
-		elif self.angle - self.yaw < 20 and self.angle - self.yaw >= 0:
+			self.HBS = self.HBS + 1
+			self.heading = 70
+		elif self.angle - self.yaw <= 20 and self.angle - self.yaw >= 0:
 			self.heading = self.angle - self.yaw
 			self.ATLS = 1
-			HBS = 0
-		elif self.angle - self.yaw > -20 and self.angle - self.yaw < 0:
+			self.HBS = 0
+		elif self.angle - self.yaw >= -20 and self.angle - self.yaw < 0:
 			self.heading = self.angle - self.yaw
 			self.ATLS = -1
-			HBS = 0
+			self.HBS = 0
 		else:
 			if self.ATLS == -1:
 				self.heading = -70
-				HBS = HBS + 1
+				self.HBS = self.HBS + 1
 			else:
 				self.heading = 70
-				HBS = HBS + 1
-		
-		if HBS > 70 and HBS <= 210 or null_target > 0 and null_target <= 40:
+				self.HBS = self.HBS + 1
+
+		if self.HBS > 30 and self.HBS <= 60:
 			self.dispatcher.dispatch(Message('calc_sens', [(self.heading * 10), self.sx-self.px, self.sz-self.pz]))
-		elif HBS > 210 or null_target > 40:
-			self.dispatcher.dispatch(Message('calc_sens', [self.heading, 0, 0]))
+		elif self.HBS > 60 and self.HBS <= 100:
+			self.dispatcher.dispatch(Message('calc_sens', [(self.heading * 15), self.sx-self.px, self.sz-self.pz]))	
+		elif self.HBS > 100 and self.HBS <= 150:
+			self.dispatcher.dispatch(Message('calc_sens', [(self.heading * 20), self.sx-self.px, self.sz-self.pz]))
+		elif self.HBS > 150:
+			self.dispatcher.dispatch(Message('calc_sens', [5, 50, 50]))
 		else:
 			self.dispatcher.dispatch(Message('calc_sens',[self.heading, self.sx-self.px, self.sz-self.pz]))
 
