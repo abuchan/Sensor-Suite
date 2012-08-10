@@ -98,7 +98,7 @@ def set_obstacle(val):
 	
 def e_stop(val):
 	sch.stop()
-	h.setMotorSpeeds(val.data[0], val.data[1])
+	h.setMotorSpeeds(0, 0)
 
 g = GUIStream(sinks = {'source_coord':[add_source], 'show_source':[show_sources],
 							'reset':[basestation_reset], 'quit':[basestation_quit],'motor':[basestation_motor], 
