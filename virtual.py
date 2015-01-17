@@ -1,13 +1,13 @@
-from optitrak_stream import OptitrakStream
+#from optitrak_stream import OptitrakStream
 from asynch_dispatch import AsynchDispatch
-from s_sGUI import GUIStream
+#from s_sGUI import GUIStream
 from basestation_stream import BasestationStream
 from callback_stream import CallbackStream
 from or_helpers_stream import HelpersStream
-from sources_stream import SourcesStream
-from sensor_stream import SensorStream
-from sources_search import SearchStream
-from obstacle_stream import ObstacleStream
+#from sources_stream import SourcesStream
+#from sensor_stream import SensorStream
+#from sources_search import SearchStream
+#from obstacle_stream import ObstacleStream
 
 import sys, glob
 import time
@@ -100,13 +100,13 @@ def e_stop(val):
 	sch.stop()
 	h.setMotorSpeeds(0, 0)
 
-g = GUIStream(sinks = {'source_coord':[add_source], 'show_source':[show_sources],
+'''g = GUIStream(sinks = {'source_coord':[add_source], 'show_source':[show_sources],
 							'reset':[basestation_reset], 'quit':[basestation_quit],'motor':[basestation_motor], 
 							'throt_speed':[basestation_throt], 'seek_source':[seek_source], 
 							'set_addr':[set_addr], 'steer_gains':[set_steer_gains], 'e-stop':[e_stop]}, 
 							callbacks = None)
-
-o = OptitrakStream(sinks = {'optitrak_data':[optitrak_update]}, autoStart = False)
+'''
+#o = OptitrakStream(sinks = {'optitrak_data':[optitrak_update]}, autoStart = False)
 
 b = BasestationStream(sinks = {'robot_data':[robotData]}, callbacks = None)
 
@@ -114,16 +114,18 @@ cal = CallbackStream(sinks = {'streaming_data':[callback_stream]}, callbacks = N
 
 h = HelpersStream(sinks = {'xb_send':[xb_send]}, callbacks = None, fileName = None)
 
-so = SourcesStream(sinks = {'source':[set_source]}, callbacks = None)
+#so = SourcesStream(sinks = {'source':[set_source]}, callbacks = None)
 
-se = SensorStream(sinks = {'calc_sens':[sensor_update]}, callbacks = None)
+#se = SensorStream(sinks = {'calc_sens':[sensor_update]}, callbacks = None)
 
-sch = SearchStream(sinks = {'get_sensor':[get_sensor_data], 'steer_rate':[basestation_throt]},
-									callbacks = None)
+#sch = SearchStream(sinks = {'get_sensor':[get_sensor_data], 'steer_rate':[basestation_throt]},
+#									callbacks = None)
 									
-ob = ObstacleStream(sinks = {'tunnel':[set_obstacle]}, callbacks = None)
+#ob = ObstacleStream(sinks = {'tunnel':[set_obstacle]}, callbacks = None)
 
 time.sleep(0.5)
+
+print 'running'
 
 while(True):
   try:

@@ -10,7 +10,7 @@ from asynch_dispatch import *
 from callback_stream import CallbackStream
 
 class BasestationStream(threading.Thread):
-	def __init__(self, sinks = None, callbacks = None, port='COM3', baudrate=57600, addr='\x30\x02', timeout=-1, 
+	def __init__(self, sinks = None, callbacks = None, port='COM1', baudrate=230400, addr='\x20\x72', timeout=-1, 
 							timeoutFunction = None):
 		threading.Thread.__init__(self)
 		self.daemon = True
